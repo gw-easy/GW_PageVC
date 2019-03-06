@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray *viewControllerClasses;
 //title类
 @property (strong, nonatomic) NSArray *titles;
+
 //整个导航栏高
 @property (assign, nonatomic) CGFloat navHeight;
 //MenuViewes
@@ -60,7 +61,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) BOOL rememberLocation;
 //当前选择的index
 @property (assign, nonatomic) NSInteger selectIndex;
-#pragma mark menuView
+
+
+#pragma mark menuView /////////////////////////////////////////////
 //菜单的frame
 @property (assign, nonatomic) CGRect menuViewFrame;
 //view的frame
@@ -77,26 +80,26 @@ NS_ASSUME_NONNULL_BEGIN
 // 是否自动通过字符串计算 MenuItem 的宽度，默认为 NO.
 @property (assign, nonatomic) BOOL automaticallyCalculatesItemWidths;
 // *  选中时的标题尺寸
-@property (assign, nonatomic) CGFloat titleSizeSelected;
+@property (strong, nonatomic) UIFont *titleSizeSelectedFont;
 //非选中时的标题尺寸
-@property (assign, nonatomic) CGFloat titleSizeNormal;
+@property (assign, nonatomic) UIFont *titleSizeNormalFont;
 //标题选中时的颜色, 颜色是可动画的.
 @property (strong, nonatomic) UIColor *titleColorSelected;
 //标题非选择时的颜色, 颜色是可动画的.
 @property (strong, nonatomic) UIColor *titleColorNormal;
 //标题的字体名字
 @property (copy, nonatomic) NSString *titleFontName;
-//每个 MenuItem 的宽度
+//每个 MenuItem 的宽度 等级最高
 @property (assign, nonatomic) CGFloat menuItemWidth;
 //各个 MenuItem 的宽度，可不等，数组内为 NSNumber.
 @property (strong, nonatomic) NSArray<NSNumber *> *itemsWidths;
 //顶部菜单栏各个 item 的间隙，因为包括头尾两端，所以确保它的数量等于控制器数量 + 1, 默认间隙为 0
 @property (strong, nonatomic) NSArray *itemsMargins;
-//如果各个间隙都想同，设置该属性，默认为 0
+//如果各个间隙都想同，设置该属性，默认为 0 等级最高
 @property (assign, nonatomic) CGFloat itemMargin;
 
 
-#pragma mark menuView->progress
+#pragma mark menuView->progress ///////////////////////////////////
 /** 进度条的速度因数，默认为 15，越小越快， 大于 0 */
 @property (assign, nonatomic) CGFloat speedFactor;
 //progressColor

@@ -14,6 +14,7 @@
 #import "ViewController4.h"
 #import "ViewController5.h"
 @interface ViewController ()<GW_PageVCDelegate>
+@property (strong, nonatomic) GW_MenuView *menuView;
 
 @end
 
@@ -23,7 +24,7 @@
     [super viewDidLoad];
 //    ViewController1 *v1 = [[ViewController1 alloc] init];
 //    ViewController2 *v2 = [[ViewController2 alloc] init];
-    [self test1];
+    [self test2];
     
     
 }
@@ -31,6 +32,22 @@
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
+}
+
+- (void)test2{
+    GW_PageViewModel *pModel = [[GW_PageViewModel alloc] init];
+    pModel.titleColorSelected = [UIColor greenColor];
+    pModel.titleColorNormal = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
+    pModel.menuViewStyle = GW_MenuViewStyleLine;
+    pModel.progressColor = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
+    pModel.showOnNavigationBar = NO;
+    pModel.menuViewLayoutMode = GW_MenuViewLayoutModeCenter;
+    pModel.titleSizeSelectedFont = [UIFont systemFontOfSize:15];
+    pModel.titles = @[@"v1",@"v2",@"v3",@"v4",@"v5",@"v1",@"v2",@"v3",@"v4",@"v5"];
+    pModel.progressWidth = 10;
+    GW_MenuView *menu = [[GW_MenuView alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, 100) mvModel:pModel];
+    [self.view addSubview:menu];
+    [menu resetFrames];
 }
 
 - (void)test1{
@@ -64,7 +81,7 @@
     vc.pModel.progressColor = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
     vc.pModel.showOnNavigationBar = NO;
     vc.pModel.menuViewLayoutMode = GW_MenuViewLayoutModeCenter;
-    vc.pModel.titleSizeSelected = 15;
+    vc.pModel.titleSizeSelectedFont = [UIFont systemFontOfSize:15];
 //    vc.pModel.selectIndex = 2;
     [self.navigationController pushViewController:vc animated:YES];
 }

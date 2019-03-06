@@ -53,19 +53,22 @@ static const NSInteger badgeView_offset = 2222;
     return _scrollView;
 }
 
+#pragma mark - 添加item
 - (void)addItems {
     [self calculateItemFrames];
+    
     for (int i = 0; i < self.mvModel.titles.count; i++) {
+        
         CGRect frame = [self.frames[i] CGRectValue];
         GW_MenuItem *item = [[GW_MenuItem alloc] initWithFrame:frame];
         item.tag = (i + menuItem_offset);
         item.delegate = self;
-        item.text = self.mvModel.titles[i];
+        item.text = [self itemTitle:i];
         item.textAlignment = NSTextAlignmentCenter;
         item.userInteractionEnabled = YES;
         item.backgroundColor = [UIColor clearColor];
-        item.normalSize    = self.mvModel.titleSizeNormal;
-        item.selectedSize  = self.mvModel.titleSizeSelected;
+        item.normalSize    = self.mvModel.titleSizeNormalFont.pointSize;
+        item.selectedSize  = self.mvModel.titleSizeSelectedFont.pointSize;
         item.normalColor   = self.mvModel.titleColorNormal;
         item.selectedColor = self.mvModel.titleColorSelected;
         item.speedFactor   = self.mvModel.speedFactor;
@@ -86,13 +89,14 @@ static const NSInteger badgeView_offset = 2222;
 
 // 计算所有item的frame值，主要是为了适配所有item的宽度之和小于屏幕宽的情况
 - (void)calculateItemFrames {
-    CGFloat contentWidth = [self.mvModel.itemsMargins[0] floatValue];
-    for (int i = 0; i < self.mvModel.titles.count; i++) {
-        CGFloat itemW = [self.mvModel.itemsWidths[i] floatValue];
+    CGFloat contentWidth = [self itemMargin:0];
+    NSInteger tCount = [self titlesCount];
+    for (int i = 0; i < tCount; i++) {
+        CGFloat itemW = [self itemWidth:i];
         CGRect frame = CGRectMake(contentWidth, 0, itemW, self.frame.size.height);
         // 记录frame
         [self.frames addObject:[NSValue valueWithCGRect:frame]];
-        contentWidth += itemW + [self.mvModel.itemsMargins[i+1] floatValue];
+        contentWidth += itemW + [self itemMargin:i+1];
     }
     // 如果总宽度小于屏幕宽,重新计算frame,为item间添加间距
     if (contentWidth < self.scrollView.frame.size.width) {
@@ -125,6 +129,89 @@ static const NSInteger badgeView_offset = 2222;
         contentWidth = self.scrollView.frame.size.width;
     }
     self.scrollView.contentSize = CGSizeMake(contentWidth, self.frame.size.height);
+}
+
+#pragma mark - title数量
+- (NSInteger)titlesCount {
+    NSInteger count = self.mvModel.titles.count;
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(numbersOfTitlesInMenuView:)]) {
+        count = [self.dataSource numbersOfTitlesInMenuView:self];
+    }
+    return count;
+}
+#pragma mark - 获取title
+- (NSString *)itemTitle:(NSInteger)num {
+    NSString *titleS = @"";
+    if (self.mvModel.titles && self.mvModel.titles.count != 0) {
+        titleS = self.mvModel.titles[num];
+    }
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(menuView:titleAtIndex:)]) {
+        titleS = [self.dataSource menuView:self titleAtIndex:num];
+    }
+    return titleS;
+}
+
+#pragma mark - 获取itemWidth
+- (NSInteger)itemWidth:(NSInteger)num {
+    [self addItemWidths];
+    CGFloat itemW = 0;
+    if (self.mvModel.itemsWidths && self.mvModel.itemsWidths.count != 0) {
+        itemW = [self.mvModel.itemsWidths[num] floatValue];
+    }
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(menuView:widthForItemAtIndex:)]) {
+        itemW = [self.dataSource menuView:self widthForItemAtIndex:num];
+    }
+    return itemW;
+}
+
+
+- (void)addItemWidths{
+    if (!self.mvModel.itemsWidths && self.mvModel.itemsWidths.count == 0) {
+        NSMutableArray *mArr = [[NSMutableArray alloc] init];
+        NSInteger tCount = [self titlesCount];
+        for (int i = 0; i<tCount; i++) {
+            if (self.mvModel.menuItemWidth > 0) {
+                [mArr addObject:[NSNumber numberWithFloat:self.mvModel.menuItemWidth]];
+            }else{
+                [mArr addObject:[NSNumber numberWithFloat:[self calculateItemWithAtIndex:i]]];
+            }
+            
+        }
+        self.mvModel.itemsWidths = mArr;
+    }
+}
+
+#pragma mark - 计算item字体宽度
+- (CGFloat)calculateItemWithAtIndex:(NSInteger)index {
+    NSString *title = self.mvModel.titles[index];
+    UIFont *titleFont = self.mvModel.titleFontName ? [UIFont fontWithName:self.mvModel.titleFontName size:self.mvModel.titleSizeSelectedFont.pointSize] : self.mvModel.titleSizeSelectedFont;
+    NSDictionary *attrs = @{NSFontAttributeName: titleFont};
+    CGFloat itemWidth = [title boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) attributes:attrs context:nil].size.width;
+    return ceil(itemWidth);
+}
+
+#pragma mark - 获取itemMargin
+- (NSInteger)itemMargin:(NSInteger)num {
+    [self addItemMargins];
+    CGFloat itemM = 0;
+    if (self.mvModel.itemsMargins && self.mvModel.itemsMargins.count != 0) {
+        itemM = [self.mvModel.itemsMargins[num] floatValue];
+    }
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(menuView:itemMarginAtIndex:)]) {
+        itemM = [self.dataSource menuView:self itemMarginAtIndex:num];
+    }
+    return itemM;
+}
+
+- (void)addItemMargins{
+    if (!self.mvModel.itemsMargins && self.mvModel.itemsMargins.count == 0) {
+        NSMutableArray *ma = [[NSMutableArray alloc] init];
+        NSInteger tCount = [self titlesCount];
+        for (int i = 0; i<tCount+1; i++) {
+            [ma addObject:[NSNumber numberWithFloat:self.mvModel.itemMargin]];
+        }
+        self.mvModel.itemsMargins = ma;
+    }
 }
 
 #pragma mark resetSelectionIfNeeded
@@ -233,21 +320,46 @@ static const NSInteger badgeView_offset = 2222;
     }
 }
 
+#pragma mark - 刷新ProgressFrames
 - (NSArray *)convertProgressWidthsToFrames {
-    if (!self.frames.count) { NSAssert(NO, @"没数据!!"); }
-    
-    if (self.mvModel.progressViewWidths.count < self.mvModel.titles.count) return self.frames;
+    if (!self.frames.count) {
+        return nil;
+    }
     
     NSMutableArray *progressFrames = [NSMutableArray array];
-    NSInteger count = (self.frames.count <= self.mvModel.progressViewWidths.count) ? self.frames.count : self.mvModel.progressViewWidths.count;
-    for (int i = 0; i < count; i++) {
+    NSInteger tCount = [self titlesCount];
+    for (int i = 0; i < tCount; i++) {
         CGRect itemFrame = [self.frames[i] CGRectValue];
-        CGFloat progressWidth = [self.mvModel.progressViewWidths[i] floatValue];
+        CGFloat progressWidth = [self progressWidth:i];
         CGFloat x = itemFrame.origin.x + (itemFrame.size.width - progressWidth) / 2;
         CGRect progressFrame = CGRectMake(x, itemFrame.origin.y, progressWidth, 0);
         [progressFrames addObject:[NSValue valueWithCGRect:progressFrame]];
     }
     return progressFrames.copy;
+}
+
+#pragma mark - 获取progressWidth
+- (NSInteger)progressWidth:(NSInteger)num {
+    [self addProgressWidth];
+    CGFloat progressW = 0;
+    if (self.mvModel.progressViewWidths && self.mvModel.progressViewWidths.count != 0) {
+        progressW = [self.mvModel.progressViewWidths[num] floatValue];
+    }
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(menuView:widthForProgressAtIndex:)]) {
+        progressW = [self.dataSource menuView:self widthForProgressAtIndex:num];
+    }
+    return progressW;
+}
+
+- (void)addProgressWidth{
+    if (!self.mvModel.progressViewWidths && self.mvModel.progressViewWidths.count == 0) {
+        NSMutableArray *ma = [[NSMutableArray alloc] init];
+        NSInteger tCount = [self titlesCount];
+        for (int i = 0; i<tCount+1; i++) {
+            [ma addObject:[NSNumber numberWithFloat:self.mvModel.progressWidth]];
+        }
+        self.mvModel.progressViewWidths = ma;
+    }
 }
 
 #pragma mark addBadgeViews

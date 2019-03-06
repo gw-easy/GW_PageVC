@@ -14,8 +14,8 @@
 @synthesize progressViewCornerRadius = _progressViewCornerRadius;
 - (instancetype)init{
     if (self = [super init]) {
-        _titleSizeSelected  = 18.0f;
-        _titleSizeNormal    = 15.0f;
+        _titleSizeSelectedFont  = [UIFont systemFontOfSize:18.0f];
+        _titleSizeNormalFont    = [UIFont systemFontOfSize:15.0f];
         _titleColorSelected = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
         _titleColorNormal   = [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
         _menuItemWidth = 65.0f;
