@@ -56,8 +56,8 @@ static const NSInteger badgeView_offset = 2222;
 #pragma mark - 添加item
 - (void)addItems {
     [self calculateItemFrames];
-    
-    for (int i = 0; i < self.mvModel.titles.count; i++) {
+    NSInteger cTitel = [self titlesCount];
+    for (int i = 0; i < cTitel; i++) {
         
         CGRect frame = [self.frames[i] CGRectValue];
         GW_MenuItem *item = [[GW_MenuItem alloc] initWithFrame:frame];
@@ -116,7 +116,7 @@ static const NSInteger badgeView_offset = 2222;
                 break;
             }
             default:{
-                CGFloat gap = distance / (self.mvModel.titles.count + 1);
+                CGFloat gap = distance / (tCount + 1);
                 shiftDis = ^CGFloat(int index) { return gap * (index + 1); };
                 break;
             }
@@ -207,8 +207,10 @@ static const NSInteger badgeView_offset = 2222;
     if (!self.mvModel.itemsMargins && self.mvModel.itemsMargins.count == 0) {
         NSMutableArray *ma = [[NSMutableArray alloc] init];
         NSInteger tCount = [self titlesCount];
-        for (int i = 0; i<tCount+1; i++) {
-            [ma addObject:[NSNumber numberWithFloat:self.mvModel.itemMargin]];
+        if (self.mvModel.itemMargin>0) {
+            for (int i = 0; i<tCount+1; i++) {
+                [ma addObject:[NSNumber numberWithFloat:self.mvModel.itemMargin]];
+            }
         }
         self.mvModel.itemsMargins = ma;
     }
@@ -364,7 +366,8 @@ static const NSInteger badgeView_offset = 2222;
 
 #pragma mark addBadgeViews
 - (void)addBadgeViews {
-    for (int i = 0; i < self.mvModel.titles.count; i++) {
+    NSInteger cTitel = [self titlesCount];
+    for (int i = 0; i < cTitel; i++) {
         [self addBadgeViewAtIndex:i];
     }
 }
@@ -415,7 +418,8 @@ static const NSInteger badgeView_offset = 2222;
 - (void)resetFramesFromIndex:(NSInteger)index {
     [self.frames removeAllObjects];
     [self calculateItemFrames];
-    for (NSInteger i = index; i < self.mvModel.titles.count; i++) {
+    NSInteger cTitel = [self titlesCount];
+    for (NSInteger i = index; i < cTitel; i++) {
         [self resetItemFrame:i];
         [self resetBadgeFrame:i];
     }
