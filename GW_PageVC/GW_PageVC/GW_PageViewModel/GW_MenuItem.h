@@ -29,8 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id<GW_MenuItemDelegate> delegate;
 @property (assign, nonatomic, readonly) BOOL selected;
 
-@property (weak, nonatomic) GW_PageViewModel *miModel;
-
 - (void)setSelected:(BOOL)selected withAnimation:(BOOL)animation;
 
 @end

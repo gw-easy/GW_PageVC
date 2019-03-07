@@ -100,9 +100,7 @@
         } else {
             [self.view addSubview:mv];
         }
-        
-        [self addItemWidths];
-        [self addItemMargins];
+
         _menuView = mv;
         self.pModel.mView = mv;
         mv.mvModel = self.pModel;
@@ -111,34 +109,9 @@
     return _menuView;
 }
 
-- (void)addItemWidths{
-    if (!self.pModel.itemsWidths && self.pModel.itemsWidths == 0) {
 
-        NSMutableArray *mArr = [[NSMutableArray alloc] init];
-        for (int i = 0; i<self.pModel.titles.count; i++) {
-            if (self.pModel.menuItemWidth > 0) {
-                [mArr addObject:[NSNumber numberWithFloat:self.pModel.menuItemWidth]];
-            }else{
-                [mArr addObject:[NSNumber numberWithFloat:[self calculateItemWithAtIndex:i]]];
-            }
-            
-        }
-        self.pModel.itemsWidths = mArr;
-        
-    }
-}
 
-- (void)addItemMargins{
-    if (!self.pModel.itemsMargins || self.pModel.itemsMargins.count == 0) {
-        NSMutableArray *ma = [[NSMutableArray alloc] init];
-        for (int i = 0; i<self.pModel.titles.count+1; i++) {
-            [ma addObject:[NSNumber numberWithFloat:self.pModel.itemMargin]];
-        }
-        self.pModel.itemsMargins = ma;
-    }else{
-        NSAssert(self.pModel.itemsMargins.count == self.pModel.titles.count+1, @"itemMargins 应该比titles数量大1");
-    }
-}
+
 
 // 创建或从缓存中获取控制器并添加到视图上
 - (void)initializedControllerWithIndexIfNeeded:(NSInteger)index {
@@ -220,13 +193,7 @@
     _shouldNotScroll = NO;
 }
 
-- (CGFloat)calculateItemWithAtIndex:(NSInteger)index {
-    NSString *title = self.pModel.titles[index];
-    UIFont *titleFont = self.pModel.titleFontName ? [UIFont fontWithName:self.pModel.titleFontName size:self.pModel.titleSizeSelected] : [UIFont systemFontOfSize:self.pModel.titleSizeSelected];
-    NSDictionary *attrs = @{NSFontAttributeName: titleFont};
-    CGFloat itemWidth = [title boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) attributes:attrs context:nil].size.width;
-    return ceil(itemWidth);
-}
+
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
