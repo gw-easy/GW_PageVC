@@ -228,7 +228,7 @@ static const NSInteger badgeView_offset = 2222;
     self.selectIndex = index;
     if (index == currentIndex || !self.selectItem) { return; }
     
-    GW_MenuItem *item = (GW_MenuItem *)[self viewWithTag:tag];
+    GW_MenuItem *item = (GW_MenuItem *)[self.scrollView viewWithTag:tag];
     [self.selectItem setSelected:NO withAnimation:NO];
     self.selectItem = item;
     [self.selectItem setSelected:YES withAnimation:NO];
@@ -432,7 +432,7 @@ static const NSInteger badgeView_offset = 2222;
 }
 
 - (void)resetItemFrame:(NSInteger)index {
-    GW_MenuItem *item = (GW_MenuItem *)[self viewWithTag:(menuItem_offset + index)];
+    GW_MenuItem *item = (GW_MenuItem *)[self.scrollView viewWithTag:(menuItem_offset + index)];
     CGRect frame = [self.frames[index] CGRectValue];
     item.frame = frame;
 }
@@ -454,8 +454,8 @@ static const NSInteger badgeView_offset = 2222;
     }
     NSInteger tag = (NSInteger)progress + menuItem_offset;
     CGFloat rate = progress - tag + menuItem_offset;
-    GW_MenuItem *currentItem = (GW_MenuItem *)[self viewWithTag:tag];
-    GW_MenuItem *nextItem = (GW_MenuItem *)[self viewWithTag:tag+1];
+    GW_MenuItem *currentItem = (GW_MenuItem *)[self.scrollView viewWithTag:tag];
+    GW_MenuItem *nextItem = (GW_MenuItem *)[self.scrollView viewWithTag:tag+1];
     if (rate == 0.0) {
         [self.selectItem setSelected:NO withAnimation:NO];
         self.selectItem = currentItem;
