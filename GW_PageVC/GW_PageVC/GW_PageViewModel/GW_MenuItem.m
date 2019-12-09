@@ -35,6 +35,12 @@
     return self;
 }
 
+- (void)setItemUI{
+    self.font = _selected?_itemM.titleSizeSelectedFont:_itemM.titleSizeNormalFont;
+    self.layer.borderWidth = _selected?_itemM.itemBorderWidthSelected:_itemM.itemBorderWidthNormal;
+    
+}
+
 - (void)setupGestureRecognizer {
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(touchUpInside:)];
     [self addGestureRecognizer:tap];
@@ -42,6 +48,7 @@
 
 - (void)setSelected:(BOOL)selected withAnimation:(BOOL)animation {
     _selected = selected;
+    [self setItemUI];
     if (!animation) {
         self.rate = selected ? 1.0 : 0.0;
         return;
@@ -96,14 +103,13 @@
         CGFloat borderb = _borderNormalBlue + (_borderSelectedBlue - _borderNormalBlue) * rate;
         CGFloat bordera = _borderNormalAlpha + (_borderSelectedAlpha - _borderNormalAlpha) * rate;
         self.layer.borderColor = [UIColor colorWithRed:borderr green:borderg blue:borderb alpha:bordera].CGColor;
-        self.layer.borderWidth = _itemM.itemBorderWidthSelected;
     }
     
     
-    CGFloat minScale = _itemM.titleSizeNormalFont.pointSize / _itemM.titleSizeSelectedFont.pointSize;
-    CGFloat trueScale = minScale + (1 - minScale)*rate;
-    self.transform = CGAffineTransformMakeScale(trueScale, trueScale);
-    NSLog(@"transform-frame = %@",NSStringFromCGRect(self.frame));
+//    CGFloat minScale = _itemM.titleSizeNormalFont.pointSize / _itemM.titleSizeSelectedFont.pointSize;
+//    CGFloat trueScale = minScale + (1 - minScale)*rate;
+//    self.transform = CGAffineTransformMakeScale(trueScale, trueScale);
+//    NSLog(@"trueScale = %f",trueScale);
 }
 
 - (void)setItemM:(GW_PageViewModel *)itemM{
@@ -127,8 +133,8 @@
 }
 
 - (void)touchUpInside:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(didPressedMenuItem:)]) {
-        [self.delegate didPressedMenuItem:self];
+    if ([self.delegate respondsToSelector:@selector(gw_didPressedMenuItem:)]) {
+        [self.delegate gw_didPressedMenuItem:self];
     }
 }
 

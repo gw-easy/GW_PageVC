@@ -36,20 +36,22 @@
 }
 
 - (void)test2{
+//    ,@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4"
     GW_PageViewModel *pModel = [[GW_PageViewModel alloc] init];
     pModel.titleColorSelected = [UIColor blueColor];
     pModel.titleColorNormal = [UIColor whiteColor];
-    pModel.menuViewStyle = GW_MenuViewStyleLine;
-    pModel.progressColor = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
+    pModel.menuViewStyle = GW_MenuViewStyleDefault;
+    pModel.progressColor = [UIColor whiteColor];
     pModel.showOnNavigationBar = NO;
     pModel.menuViewLayoutMode = GW_MenuViewLayoutModeScatter;
-//    pModel.menuItemWidth = 60;
+    pModel.menuItemWidth = 100;
 //    pModel.titleSizeSelectedFont = pModel.titleSizeNormalFont = [UIFont systemFontOfSize:11];
     pModel.titles = @[@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4"];
     pModel.progressWidth = 10;
     pModel.itemBackColorNormal = [UIColor redColor];
     pModel.itemBackColorSelected = [UIColor greenColor];
-//    pModel.itemBorderWidthSelected = 2;
+    pModel.itemBorderWidthSelected = 2;
+    pModel.itemBorderWidthNormal = 5;
     pModel.itemBorderColorSelected = [UIColor orangeColor];
     pModel.itemCornerRadius = 5;
     pModel.itemBorderColorNormal = [UIColor purpleColor];

@@ -312,8 +312,9 @@ static const NSInteger badgeView_offset = 2222;
     pView.speedFactor = self.mvModel.speedFactor;
     pView.backgroundColor = [UIColor clearColor];
     [pView moveToPostion:self.mvModel.selectIndex];
-    self.progressView = pView;
-    [self.scrollView insertSubview:self.progressView atIndex:0];
+    _progressView = pView;
+    [self.scrollView addSubview:pView];
+    [self.scrollView bringSubviewToFront:pView];
 }
 
 - (CGRect)calculateProgressViewFrame {
@@ -446,10 +447,6 @@ static const NSInteger badgeView_offset = 2222;
     GW_MenuItem *item = (GW_MenuItem *)[self.scrollView viewWithTag:(menuItem_offset + index)];
     CGRect frame = [self.frames[index] CGRectValue];
     item.frame = frame;
-    if (index == _mvModel.selectIndex) {
-        [item setSelected:NO withAnimation:NO];
-        [item setSelected:YES withAnimation:NO];
-    }
 }
 
 - (void)resetBadgeFrame:(NSInteger)index {
@@ -490,7 +487,7 @@ static const NSInteger badgeView_offset = 2222;
 }
 
 #pragma mark - Menu item delegate
-- (void)didPressedMenuItem:(GW_MenuItem *)menuItem {
+- (void)gw_didPressedMenuItem:(GW_MenuItem *)menuItem {
     
     CGFloat progress = menuItem.tag - menuItem_offset;
     [self.progressView moveToPostion:progress];
@@ -501,8 +498,8 @@ static const NSInteger badgeView_offset = 2222;
         [self.delegate menuView:self didSelesctedIndex:menuItem.tag - menuItem_offset currentIndex:currentIndex];
     }
     
-    [self.selectItem setSelected:NO withAnimation:NO];
-    [menuItem setSelected:YES withAnimation:NO];
+    [self.selectItem setSelected:NO withAnimation:YES];
+    [menuItem setSelected:YES withAnimation:YES];
     self.selectItem = menuItem;
     
     NSTimeInterval delay = self.mvModel.menuViewStyle == GW_MenuViewStyleDefault ? 0 : 0.3f;

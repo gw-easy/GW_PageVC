@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol GW_MenuItemDelegate <NSObject>
 @optional
 //点击事件
-- (void)didPressedMenuItem:(GW_MenuItem *)menuItem;
+- (void)gw_didPressedMenuItem:(GW_MenuItem *)menuItem;
 @end
 @interface GW_MenuItem : UILabel
 ///> 设置 rate, 并刷新标题状态 (0~1)
