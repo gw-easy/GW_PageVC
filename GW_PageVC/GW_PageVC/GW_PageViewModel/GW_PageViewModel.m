@@ -18,83 +18,30 @@
         _titleSizeNormalFont    = [UIFont systemFontOfSize:15.0f];
         _titleColorSelected = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
         _titleColorNormal   = [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
+        _itemBackColorNormal = _itemBackColorSelected = _itemBorderColorNormal = _itemBorderColorSelected = [UIColor clearColor];
         _menuItemWidth = 65.0f;
 
         _progressColor = [UIColor blackColor];
         _scrollEnable = YES;
-        _progressViewCornerRadius = 0;
+        _itemBorderWidthNormal = _itemBorderWidthSelected = _itemCornerRadius = _progressViewCornerRadius = 0;
         _progressHeight = 2;
         _automaticallyCalculatesItemWidths = NO;
         _menuViewLayoutMode = GW_MenuViewLayoutModeScatter;
+        _menuViewStyle = GW_MenuViewStyleDefault;
+        _speedFactor = 15;
         _navHeight = navStateBar + navBarHeight;
     }
     return self;
 }
 
-#pragma mark setter
-- (void)setScrollEnable:(BOOL)scrollEnable {
-    _scrollEnable = scrollEnable;
-    if (self.sView) {
-        self.sView.scrollEnabled = scrollEnable;
-    }
-}
-
-- (void)setBounces:(BOOL)bounces{
-    _bounces = bounces;
-    if (self.sView) {
-        self.sView.bounces = bounces;
-    }
-}
-
-- (void)setContentMargin:(CGFloat)contentMargin{
-    _contentMargin = contentMargin;
-    if (self.mView.scrollView) {
-        [self.mView resetFrames];
-    }
-}
-
-- (void)setMenuViewLayoutMode:(GW_MenuViewLayoutMode)menuViewLayoutMode{
-    _menuViewLayoutMode = menuViewLayoutMode;
-    if (self.mView.superview) {
-        [self.mView reload];
-    }
-}
-
-- (void)setProgressViewCornerRadius:(CGFloat)progressViewCornerRadius {
-    _progressViewCornerRadius = progressViewCornerRadius;
-    if (self.mView.progressView) {
-        self.mView.progressView.cornerRadius = _progressViewCornerRadius;
-    }
-}
-
-- (void)setProgressViewIsNaughty:(BOOL)progressViewIsNaughty {
-    _progressViewIsNaughty = progressViewIsNaughty;
-    if (self.mView.progressView) {
-        self.mView.progressView.naughty = progressViewIsNaughty;
-    }
-}
-
-- (void)setProgressViewWidths:(NSArray *)progressViewWidths{
-    _progressViewWidths = progressViewWidths;
-    if (self.mView) {
-        [self.mView resetFramesFromIndex:0];
-    }
-}
-
-- (void)setSpeedFactor:(CGFloat)speedFactor {
-    _speedFactor = speedFactor;
-    if (self.mView.progressView) {
-        self.mView.progressView.speedFactor = _speedFactor;
-    }
-    
-    [self.sView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj isKindOfClass:[GW_MenuItem class]]) {
-            ((GW_MenuItem *)obj).speedFactor = _speedFactor;
-        }
-    }];
-}
-
 #pragma mark getter
+- (CGFloat)speedFactor {
+    if (_speedFactor <= 0) {
+        _speedFactor = 15.0;
+    }
+    return _speedFactor;
+}
+
 - (CGFloat)progressHeight{
     switch (self.menuViewStyle) {
         case GW_MenuViewStyleLine:

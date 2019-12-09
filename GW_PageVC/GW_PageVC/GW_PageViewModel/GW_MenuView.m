@@ -12,26 +12,44 @@ static const NSInteger badgeView_offset = 2222;
 @interface GW_MenuView()<GW_MenuItemDelegate>
 @property (strong, nonatomic) GW_MenuItem *selectItem;
 @property (strong, nonatomic) NSMutableArray *frames;
-@property (assign, nonatomic) NSInteger selectIndex;
 @end
 
 @implementation GW_MenuView
 
-- (instancetype)initWithFrame:(CGRect)frame mvModel:(GW_PageViewModel *)mvModel{
+- (void)awakeFromNib{
+    [super awakeFromNib];
+    [self setUI];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
-        _mvModel = mvModel;
-        //    添加_scrollView
-        [self scrollView];
-        //    添加items
-        [self addItems];
-        //    添加progress
-        [self makeStyle];
-        //    添加badgeView 如果有角标
-        [self addBadgeViews];
-        //    刷新选中item的位置
-        [self resetSelectionIfNeeded];
+        [self setUI];
     }
     return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame mvModel:(GW_PageViewModel *)mvModel{
+    _mvModel = mvModel;
+    return [self initWithFrame:frame];
+}
+
+- (void)setMvModel:(GW_PageViewModel *)mvModel{
+    _mvModel = mvModel;
+    [self reload];
+}
+
+#pragma mark - UI
+- (void)setUI{
+    //    添加_scrollView
+    [self scrollView];
+    //    添加items
+    [self addItems];
+    //    添加progress
+    [self makeStyle];
+    //    添加badgeView 如果有角标
+    [self addBadgeViews];
+    //    刷新选中item的位置
+    [self resetSelectionIfNeeded];
 }
 
 - (UIScrollView *)scrollView{
@@ -58,21 +76,12 @@ static const NSInteger badgeView_offset = 2222;
     [self calculateItemFrames];
     NSInteger cTitel = [self titlesCount];
     for (int i = 0; i < cTitel; i++) {
-        
         CGRect frame = [self.frames[i] CGRectValue];
         GW_MenuItem *item = [[GW_MenuItem alloc] initWithFrame:frame];
         item.tag = (i + menuItem_offset);
         item.delegate = self;
         item.text = [self itemTitle:i];
-        item.textAlignment = NSTextAlignmentCenter;
-        item.userInteractionEnabled = YES;
-        item.backgroundColor = [UIColor clearColor];
-        item.normalSize    = self.mvModel.titleSizeNormalFont.pointSize;
-        item.selectedSize  = self.mvModel.titleSizeSelectedFont.pointSize;
-        item.normalColor   = self.mvModel.titleColorNormal;
-        item.selectedColor = self.mvModel.titleColorSelected;
-        item.speedFactor   = self.mvModel.speedFactor;
-        item.font = self.mvModel.titleFontName != nil?[UIFont fontWithName:self.mvModel.titleFontName size:item.selectedSize]:[UIFont systemFontOfSize:item.selectedSize];
+        item.itemM = self.mvModel;
         // MARK:- 设置自定义item
         if ([self.dataSource respondsToSelector:@selector(menuView:initialMenuItem:atIndex:)]) {
             item = [self.dataSource menuView:self initialMenuItem:item atIndex:i];
@@ -94,6 +103,7 @@ static const NSInteger badgeView_offset = 2222;
     for (int i = 0; i < tCount; i++) {
         CGFloat itemW = [self itemWidth:i];
         CGRect frame = CGRectMake(contentWidth, 0, itemW, self.frame.size.height);
+        NSLog(@"frame = %@",NSStringFromCGRect(frame));
         // 记录frame
         [self.frames addObject:[NSValue valueWithCGRect:frame]];
         contentWidth += itemW + [self itemMargin:i+1];
@@ -124,6 +134,7 @@ static const NSInteger badgeView_offset = 2222;
         for (int i = 0; i < self.frames.count; i++) {
             CGRect frame = [self.frames[i] CGRectValue];
             frame.origin.x += shiftDis(i);
+            NSLog(@"frame = %@",NSStringFromCGRect(frame));
             self.frames[i] = [NSValue valueWithCGRect:frame];
         }
         contentWidth = self.scrollView.frame.size.width;
@@ -166,7 +177,7 @@ static const NSInteger badgeView_offset = 2222;
 
 
 - (void)addItemWidths{
-    if (!self.mvModel.itemsWidths && self.mvModel.itemsWidths.count == 0) {
+    if (!self.mvModel.itemsWidths || self.mvModel.itemsWidths.count == 0) {
         NSMutableArray *mArr = [[NSMutableArray alloc] init];
         NSInteger tCount = [self titlesCount];
         for (int i = 0; i<tCount; i++) {
@@ -218,20 +229,20 @@ static const NSInteger badgeView_offset = 2222;
 
 #pragma mark resetSelectionIfNeeded
 - (void)resetSelectionIfNeeded {
-    if (self.selectIndex == 0) { return; }
-    [self selectItemAtIndex:self.selectIndex];
+    if (_mvModel.selectIndex == 0) { return; }
+    [self selectItemAtIndex:_mvModel.selectIndex];
 }
 
 - (void)selectItemAtIndex:(NSInteger)index {
-    NSInteger tag = index + menuItem_offset;
     NSInteger currentIndex = self.selectItem.tag - menuItem_offset;
-    self.selectIndex = index;
     if (index == currentIndex || !self.selectItem) { return; }
     
+    NSInteger tag = index + menuItem_offset;
+    _mvModel.selectIndex = index;
     GW_MenuItem *item = (GW_MenuItem *)[self.scrollView viewWithTag:tag];
-    [self.selectItem setSelected:NO withAnimation:NO];
+    [self.selectItem setSelected:NO withAnimation:YES];
+    [item setSelected:YES withAnimation:YES];
     self.selectItem = item;
-    [self.selectItem setSelected:YES withAnimation:NO];
     [self.progressView setProgressWithOutAnimate:index];
     if ([self.delegate respondsToSelector:@selector(menuView:didSelesctedIndex:currentIndex:)]) {
         [self.delegate menuView:self didSelesctedIndex:index currentIndex:currentIndex];
@@ -435,6 +446,10 @@ static const NSInteger badgeView_offset = 2222;
     GW_MenuItem *item = (GW_MenuItem *)[self.scrollView viewWithTag:(menuItem_offset + index)];
     CGRect frame = [self.frames[index] CGRectValue];
     item.frame = frame;
+    if (index == _mvModel.selectIndex) {
+        [item setSelected:NO withAnimation:NO];
+        [item setSelected:YES withAnimation:NO];
+    }
 }
 
 - (void)resetBadgeFrame:(NSInteger)index {
@@ -481,12 +496,13 @@ static const NSInteger badgeView_offset = 2222;
     [self.progressView moveToPostion:progress];
     
     NSInteger currentIndex = self.selectItem.tag - menuItem_offset;
+    _mvModel.selectIndex = currentIndex;
     if ([self.delegate respondsToSelector:@selector(menuView:didSelesctedIndex:currentIndex:)]) {
         [self.delegate menuView:self didSelesctedIndex:menuItem.tag - menuItem_offset currentIndex:currentIndex];
     }
     
-    [self.selectItem setSelected:NO withAnimation:YES];
-    [menuItem setSelected:YES withAnimation:YES];
+    [self.selectItem setSelected:NO withAnimation:NO];
+    [menuItem setSelected:YES withAnimation:NO];
     self.selectItem = menuItem;
     
     NSTimeInterval delay = self.mvModel.menuViewStyle == GW_MenuViewStyleDefault ? 0 : 0.3f;

@@ -29,6 +29,7 @@
     
 }
 
+
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
@@ -36,18 +37,26 @@
 
 - (void)test2{
     GW_PageViewModel *pModel = [[GW_PageViewModel alloc] init];
-    pModel.titleColorSelected = [UIColor greenColor];
-    pModel.titleColorNormal = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
+    pModel.titleColorSelected = [UIColor blueColor];
+    pModel.titleColorNormal = [UIColor whiteColor];
     pModel.menuViewStyle = GW_MenuViewStyleLine;
     pModel.progressColor = [UIColor colorWithRed:168.0/255.0 green:20.0/255.0 blue:4/255.0 alpha:1];
     pModel.showOnNavigationBar = NO;
-    pModel.menuViewLayoutMode = GW_MenuViewLayoutModeCenter;
-    pModel.titleSizeSelectedFont = [UIFont systemFontOfSize:15];
-    pModel.titles = @[@"v1",@"v2",@"v3",@"v4",@"v5",@"v1",@"v2",@"v3",@"v4",@"v5"];
+    pModel.menuViewLayoutMode = GW_MenuViewLayoutModeScatter;
+//    pModel.menuItemWidth = 60;
+//    pModel.titleSizeSelectedFont = pModel.titleSizeNormalFont = [UIFont systemFontOfSize:11];
+    pModel.titles = @[@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4"];
     pModel.progressWidth = 10;
+    pModel.itemBackColorNormal = [UIColor redColor];
+    pModel.itemBackColorSelected = [UIColor greenColor];
+//    pModel.itemBorderWidthSelected = 2;
+    pModel.itemBorderColorSelected = [UIColor orangeColor];
+    pModel.itemCornerRadius = 5;
+    pModel.itemBorderColorNormal = [UIColor purpleColor];
+    
     GW_MenuView *menu = [[GW_MenuView alloc] initWithFrame:CGRectMake(0, 200, self.view.frame.size.width, 100) mvModel:pModel];
     [self.view addSubview:menu];
-    [menu resetFrames];
+//    [menu resetFrames];
 }
 
 - (void)test1{

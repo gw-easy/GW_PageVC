@@ -80,7 +80,7 @@
         sv.delegate = self;
         [self.view addSubview:sv];
         _gwSV = sv;
-        self.pModel.sView = sv;
+//        self.pModel.sView = sv;
         [self adjustScrollViewFrame];
         if (!self.navigationController) return _gwSV;
         for (UIGestureRecognizer *gestureRecognizer in _gwSV.gestureRecognizers) {
@@ -102,7 +102,7 @@
         }
 
         _menuView = mv;
-        self.pModel.mView = mv;
+//        self.pModel.mView = mv;
         mv.mvModel = self.pModel;
         [_menuView resetFrames];
     }

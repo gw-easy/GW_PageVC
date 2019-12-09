@@ -38,15 +38,10 @@ typedef NS_ENUM(NSUInteger, GW_MenuViewLayoutMode) {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface GW_PageViewModel : NSObject
-//GW_ScrollView
-@property (weak, nonatomic) GW_ScrollView *sView;
-//GW_MenuView
-@property (weak, nonatomic) GW_MenuView *mView;
 //控制器类
 @property (strong, nonatomic) NSArray *viewControllerClasses;
 //title类
 @property (strong, nonatomic) NSArray *titles;
-
 //整个导航栏高
 @property (assign, nonatomic) CGFloat navHeight;
 //MenuViewes
@@ -79,6 +74,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) BOOL pageAnimatable;
 // 是否自动通过字符串计算 MenuItem 的宽度，默认为 NO.
 @property (assign, nonatomic) BOOL automaticallyCalculatesItemWidths;
+
+
+#pragma mark menuView->Item ///////////////////////////////
 // *  选中时的标题尺寸
 @property (strong, nonatomic) UIFont *titleSizeSelectedFont;
 //非选中时的标题尺寸
@@ -89,6 +87,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIColor *titleColorNormal;
 //标题的字体名字
 @property (copy, nonatomic) NSString *titleFontName;
+//MenuItem 选中背景色 默认clear 颜色是可动画的.
+@property (strong, nonatomic) UIColor *itemBackColorSelected;
+//MenuItem 正常背景色 默认clear 颜色是可动画的.
+@property (strong, nonatomic) UIColor *itemBackColorNormal;
+//MenuItem 边框选中颜色 默认clear.
+@property (strong, nonatomic) UIColor *itemBorderColorSelected;
+//MenuItem 边框正常颜色色 默认clear.
+@property (strong, nonatomic) UIColor *itemBorderColorNormal;
+//MenuItem 边框选中颜色 默认0.
+@property (assign, nonatomic) CGFloat itemBorderWidthSelected;
+//MenuItem 边框正常颜色色 默认0.
+@property (assign, nonatomic) CGFloat itemBorderWidthNormal;
+//MenuItem 圆角
+@property (assign, nonatomic) CGFloat itemCornerRadius;
 //每个 MenuItem 的宽度 等级最高
 @property (assign, nonatomic) CGFloat menuItemWidth;
 //各个 MenuItem 的宽度，可不等，数组内为 NSNumber.
