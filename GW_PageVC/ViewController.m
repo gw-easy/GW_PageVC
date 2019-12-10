@@ -45,13 +45,15 @@
     pModel.showOnNavigationBar = NO;
     pModel.menuViewLayoutMode = GW_MenuViewLayoutModeScatter;
     pModel.menuItemWidth = 100;
-//    pModel.titleSizeSelectedFont = pModel.titleSizeNormalFont = [UIFont systemFontOfSize:11];
+    pModel.speedFactor = 20;
+    pModel.titleSizeSelectedFont = [UIFont systemFontOfSize:40];
+    pModel.titleSizeNormalFont = [UIFont systemFontOfSize:40];
     pModel.titles = @[@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4",@"v1",@"v2",@"v3",@"v4"];
     pModel.progressWidth = 10;
     pModel.itemBackColorNormal = [UIColor redColor];
     pModel.itemBackColorSelected = [UIColor greenColor];
-    pModel.itemBorderWidthSelected = 2;
-    pModel.itemBorderWidthNormal = 5;
+    pModel.itemBorderWidthSelected = 5;
+    pModel.itemBorderWidthNormal = 1;
     pModel.itemBorderColorSelected = [UIColor orangeColor];
     pModel.itemCornerRadius = 5;
     pModel.itemBorderColorNormal = [UIColor purpleColor];

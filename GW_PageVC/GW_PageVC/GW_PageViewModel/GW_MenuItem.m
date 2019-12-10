@@ -35,12 +35,6 @@
     return self;
 }
 
-- (void)setItemUI{
-    self.font = _selected?_itemM.titleSizeSelectedFont:_itemM.titleSizeNormalFont;
-    self.layer.borderWidth = _selected?_itemM.itemBorderWidthSelected:_itemM.itemBorderWidthNormal;
-    
-}
-
 - (void)setupGestureRecognizer {
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(touchUpInside:)];
     [self addGestureRecognizer:tap];
@@ -48,13 +42,14 @@
 
 - (void)setSelected:(BOOL)selected withAnimation:(BOOL)animation {
     _selected = selected;
-    [self setItemUI];
+    BOOL selectUP = _itemM.titleSizeSelectedFont.pointSize > _itemM.titleSizeNormalFont.pointSize;
     if (!animation) {
-        self.rate = selected ? 1.0 : 0.0;
+        self.rate = selectUP?(selected ? 1.0 : 0.0):(selected ? 0.0 : 1.0);
         return;
     }
-    _sign = selected ? 1 : -1;
-    _gap  = selected ? (1.0 - self.rate) : (self.rate - 0.0);
+    
+    _sign = selectUP?(selected ? 1 : -1):(selected ? -1 : 1);
+    _gap  = selectUP?(selected?(1.0 - self.rate):(self.rate - 0.0)):(selected?(self.rate - 0.0):(1.0 - self.rate));
     _step = _gap / _itemM.speedFactor;
     if (_link) {
         [_link invalidate];
@@ -91,44 +86,66 @@
     CGFloat g = _normalGreen + (_selectedGreen - _normalGreen) * rate;
     CGFloat b = _normalBlue + (_selectedBlue - _normalBlue) * rate;
     CGFloat a = _normalAlpha + (_selectedAlpha - _normalAlpha) * rate;
-    CGFloat backr = _backNormalRed + (_backSelectedRed - _backNormalRed) * rate;
-    CGFloat backg = _backNormalGreen + (_backSelectedGreen - _backNormalGreen) * rate;
-    CGFloat backb = _backNormalBlue + (_backSelectedBlue - _backNormalBlue) * rate;
-    CGFloat backa = _backNormalAlpha + (_backSelectedAlpha - _backNormalAlpha) * rate;
     self.textColor = [UIColor colorWithRed:r green:g blue:b alpha:a];
-    self.backgroundColor = [UIColor colorWithRed:backr green:backg blue:backb alpha:backa];
-    if (_itemM.itemBorderWidthNormal > 0 || _itemM.itemBorderWidthSelected > 0) {
-        CGFloat borderr = _borderNormalRed + (_borderSelectedRed - _borderNormalRed) * rate;
-        CGFloat borderg = _borderNormalGreen + (_borderSelectedGreen - _borderNormalGreen) * rate;
-        CGFloat borderb = _borderNormalBlue + (_borderSelectedBlue - _borderNormalBlue) * rate;
-        CGFloat bordera = _borderNormalAlpha + (_borderSelectedAlpha - _borderNormalAlpha) * rate;
-        self.layer.borderColor = [UIColor colorWithRed:borderr green:borderg blue:borderb alpha:bordera].CGColor;
+    
+    if (!CGColorEqualToColor(_itemM.itemBorderColorSelected.CGColor, [UIColor clearColor].CGColor) && !CGColorEqualToColor(_itemM.itemBorderColorNormal.CGColor, [UIColor clearColor].CGColor)) {
+        r = _backNormalRed + (_backSelectedRed - _backNormalRed) * rate;
+        g = _backNormalGreen + (_backSelectedGreen - _backNormalGreen) * rate;
+        b = _backNormalBlue + (_backSelectedBlue - _backNormalBlue) * rate;
+        a = _backNormalAlpha + (_backSelectedAlpha - _backNormalAlpha) * rate;
+        self.backgroundColor = [UIColor colorWithRed:r green:g blue:b alpha:a];
     }
     
     
-//    CGFloat minScale = _itemM.titleSizeNormalFont.pointSize / _itemM.titleSizeSelectedFont.pointSize;
-//    CGFloat trueScale = minScale + (1 - minScale)*rate;
-//    self.transform = CGAffineTransformMakeScale(trueScale, trueScale);
-//    NSLog(@"trueScale = %f",trueScale);
+    
+    BOOL selectUP = _itemM.titleSizeSelectedFont.pointSize > _itemM.titleSizeNormalFont.pointSize;
+    
+    CGFloat selFont = selectUP?_itemM.titleSizeSelectedFont.pointSize:_itemM.titleSizeNormalFont.pointSize;
+    CGFloat minScale = selectUP?_itemM.titleSizeNormalFont.pointSize/_itemM.titleSizeSelectedFont.pointSize: _itemM.titleSizeSelectedFont.pointSize/_itemM.titleSizeNormalFont.pointSize;
+    CGFloat trueScale = minScale + (1 - minScale)*rate;
+    self.font = [UIFont systemFontOfSize:selFont*trueScale];
+    
+    
+    
+    
+    if ((_itemM.itemBorderWidthNormal > 0 && !CGColorEqualToColor(_itemM.itemBorderColorNormal.CGColor, [UIColor clearColor].CGColor)) || (_itemM.itemBorderWidthSelected > 0 && !CGColorEqualToColor(_itemM.itemBorderColorSelected.CGColor, [UIColor clearColor].CGColor))) {
+        r = _borderNormalRed + (_borderSelectedRed - _borderNormalRed) * rate;
+        g = _borderNormalGreen + (_borderSelectedGreen - _borderNormalGreen) * rate;
+        b = _borderNormalBlue + (_borderSelectedBlue - _borderNormalBlue) * rate;
+        a = _borderNormalAlpha + (_borderSelectedAlpha - _borderNormalAlpha) * rate;
+        self.layer.borderColor = [UIColor colorWithRed:r green:g blue:b alpha:a].CGColor;
+        BOOL selectBorder = _itemM.itemBorderWidthSelected > _itemM.itemBorderWidthNormal;
+        if (selectUP != selectBorder) {
+            rate = 1-rate;
+        }
+        selFont = selectBorder?_itemM.itemBorderWidthSelected:_itemM.itemBorderWidthNormal;
+        minScale = selectBorder?_itemM.itemBorderWidthNormal/_itemM.itemBorderWidthSelected:_itemM.itemBorderWidthSelected/_itemM.itemBorderWidthNormal;
+        trueScale = minScale + (1 - minScale)*rate;
+
+        self.layer.borderWidth = selFont*trueScale;
+    }
 }
 
 - (void)setItemM:(GW_PageViewModel *)itemM{
     _itemM = itemM;
     [itemM.titleColorSelected getRed:&_selectedRed green:&_selectedGreen blue:&_selectedBlue alpha:&_selectedAlpha];
     [itemM.titleColorNormal getRed:&_normalRed green:&_normalGreen blue:&_normalBlue alpha:&_normalAlpha];
-    [itemM.itemBackColorSelected getRed:&_backSelectedRed green:&_backSelectedGreen blue:&_backSelectedBlue alpha:&_backSelectedAlpha];
-    [itemM.itemBackColorNormal getRed:&_backNormalRed green:&_backNormalGreen blue:&_backNormalBlue alpha:&_backNormalAlpha];
+    
+    if (!CGColorEqualToColor(itemM.itemBorderColorSelected.CGColor, [UIColor clearColor].CGColor) && !CGColorEqualToColor(itemM.itemBorderColorNormal.CGColor, [UIColor clearColor].CGColor)) {
+        [itemM.itemBackColorSelected getRed:&_backSelectedRed green:&_backSelectedGreen blue:&_backSelectedBlue alpha:&_backSelectedAlpha];
+        [itemM.itemBackColorNormal getRed:&_backNormalRed green:&_backNormalGreen blue:&_backNormalBlue alpha:&_backNormalAlpha];
+    }
     
     self.backgroundColor = itemM.itemBackColorNormal;
     self.font = itemM.titleFontName != nil?[UIFont fontWithName:itemM.titleFontName size:_itemM.titleSizeSelectedFont.pointSize]:[UIFont systemFontOfSize:_itemM.titleSizeSelectedFont.pointSize];
     
-    if (itemM.itemBorderWidthNormal > 0 || itemM.itemBorderWidthSelected > 0) {
+    if ((itemM.itemBorderWidthNormal > 0 && !CGColorEqualToColor(itemM.itemBorderColorNormal.CGColor, [UIColor clearColor].CGColor)) || (itemM.itemBorderWidthSelected > 0 && !CGColorEqualToColor(itemM.itemBorderColorSelected.CGColor, [UIColor clearColor].CGColor))) {
         [itemM.itemBorderColorNormal getRed:&_borderNormalRed green:&_borderNormalGreen blue:&_borderNormalBlue alpha:&_borderNormalAlpha];
         [itemM.itemBorderColorSelected getRed:&_borderSelectedRed green:&_borderSelectedGreen blue:&_borderSelectedBlue alpha:&_borderSelectedAlpha];
-        if (itemM.itemCornerRadius > 0) {
-            self.layer.cornerRadius = itemM.itemCornerRadius;
-            self.clipsToBounds = YES;
-        }
+    }
+    if (itemM.itemCornerRadius > 0) {
+        self.layer.cornerRadius = itemM.itemCornerRadius;
+        self.clipsToBounds = YES;
     }
 }
 
